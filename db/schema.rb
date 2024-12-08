@@ -33,7 +33,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_08_194354) do
     t.string "first_name"
     t.string "last_name"
     t.string "surname"
-    t.integer "school_id"
+    t.string "class_id"
+    t.string "school_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "class_group_id", null: false

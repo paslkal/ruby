@@ -12,10 +12,17 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
   app:
     container_name: app
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bin/rails db:migrate && bin/rails db:seed && bin/rails s -p 3000 -b '0.0.0.0'"
+    command: bash -c "rm -f tmp/pids/server.pid && bin/rails db:migrate && bin/rails s -p 3000 -b '0.0.0.0'"
     environment:
       - RAILS_ENV=${RAILS_ENV}
       - POSTGRES_HOST=${POSTGRES_HOST}

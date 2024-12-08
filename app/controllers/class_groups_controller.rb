@@ -8,7 +8,7 @@ class ClassGroupsController < ApplicationController
 
     class_groups = school.class_groups
 
-    render json: { data: class_groups }, status: :ok
+    render json: class_groups, status: :ok
   end
 
   def create 

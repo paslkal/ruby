@@ -7,7 +7,7 @@ class StudentsController < ApplicationController
     return render json: { message: 'Class not found' }, status: :not_found if school_class.nil?
   
     students = school_class.students
-    render json: { data: students }
+    render json: students
   end
   
   
