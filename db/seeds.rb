@@ -1,9 +1,24 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+school = School.create!(id: 1)
+
+classes_data = [
+  { id: 1, number: 10, letter: "A", students_count: 3 },
+  { id: 2, number: 11, letter: "B", students_count: 2 }
+]
+
+classes_data.each do |class_data|
+  class_group = ClassGroup.create!(
+    id: class_data[:id],
+    number: class_data[:number],
+    letter: class_data[:letter],
+    school_id: school.id
+  )
+
+  class_data[:students_count].times do |i|
+    Student.create!(
+      class_group_id: class_group.id,
+      school_id: school.id
+    )
+  end
+end
+
+puts "Data successfully created!"
