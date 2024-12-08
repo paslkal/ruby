@@ -1,4 +1,16 @@
 class StudentsController < ApplicationController
+  def index
+    school = School.find(params[:school_id])
+    return render json: { message: 'School not found' }, status: :not_found if school.nil?
+  
+    school_class = school.class_groups.find_by(id: params[:class_id])
+    return render json: { message: 'Class not found' }, status: :not_found if school_class.nil?
+  
+    students = school_class.students
+    render json: { data: students }
+  end
+  
+  
   def create
     @student = Student.create(student_params)
     
