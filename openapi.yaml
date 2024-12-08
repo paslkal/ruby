@@ -141,7 +141,7 @@ components:
           example: 10
           readOnly: true
         number:
-          type: integer
+          type: integer`
           format: int32
           example: 1
           description: Цифра класса

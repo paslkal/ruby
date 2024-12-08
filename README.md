@@ -1,1 +1,3 @@
+```bash
 docker-compose up
+```
