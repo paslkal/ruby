@@ -9,6 +9,18 @@ class StudentsController < ApplicationController
     end
   end
 
+  def destroy
+    @student = Student.find_by(id: params[:id])
+  
+    if @student
+      @student.destroy
+      render json: { message: 'Student successfully deleted' }
+    else
+      render json: { message: 'Student not found' }, status: :not_found
+    end
+  end
+  
+
   private 
 
   def student_params
