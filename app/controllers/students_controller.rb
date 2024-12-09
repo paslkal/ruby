@@ -2,14 +2,20 @@ require 'digest'
 
 class StudentsController < ApplicationController
   def index
-    school = School.find(params[:school_id])
+    school = School.find_by(id: params[:school_id])
+    if school.nil?
+      return render json: { message: 'School not found' }, status: :not_found
+    end
   
-    school_class = school.class_groups.find(params[:class_id])
+    school_class = school.class_groups.find_by(id: params[:class_id])
+    if school_class.nil?
+      return render json: { message: 'Class not found' }, status: :not_found
+    end
   
     students = school_class.students
     render json: students
   end
-  
+    
   
   def create
     school = School.find_or_create_by(id: params[:school_id])
