@@ -40,10 +40,8 @@ class StudentsController < ApplicationController
   end
 
   def destroy
-    auth_token = request.headers['X-Auth-Token']
-
-    puts auth_token
-
+    auth_header = request.headers['Authorization']
+    auth_token = auth_header.split(' ').last if auth_header.present?
     unless valid_token?(auth_token)
       return render json: { message: 'Некорректная авторизация' }, status: :unauthorized
     end
