@@ -1,10 +1,10 @@
+require 'digest'
+
 class StudentsController < ApplicationController
   def index
     school = School.find(params[:school_id])
-    return render json: { message: 'School not found' }, status: :not_found if school.nil?
   
-    school_class = school.class_groups.find_by(id: params[:class_id])
-    return render json: { message: 'Class not found' }, status: :not_found if school_class.nil?
+    school_class = school.class_groups.find(params[:class_id])
   
     students = school_class.students
     render json: students
@@ -12,12 +12,23 @@ class StudentsController < ApplicationController
   
   
   def create
-    @student = Student.create(student_params)
-    
+    school = School.find_or_create_by(id: params[:school_id])
+
+    school_class = school.class_groups.find_or_create_by(id: params[:class_id]) do |cg|
+      cg.number = params[:class_number] 
+      cg.letter = params[:class_letter]
+    end
+
+    @student = school_class.students.create(student_params.merge(class_group_id: school_class.id, school_id: school.id))
+
     if @student.save
-      render json: @student.as_json
-    else 
-      render json: {message: 'NOT DONE', errors: @student.errors.full_messages}
+      user_id = @student.id
+      secret_salt = 'paslkal'
+      token = generate_token(user_id, secret_salt)
+
+      render json: { student: @student.as_json, auth_token: token }, status: :created
+    else
+      render json: { message: 'Invalid Input', errors: @student.errors.full_messages }, status: :method_not_allowed
     end
   end
 
@@ -28,12 +39,16 @@ class StudentsController < ApplicationController
       @student.destroy
       render json: { message: 'Student successfully deleted' }
     else
-      render json: { message: 'Student not found' }, status: :not_found
+      render json: { message: 'Некорректный id студента' }, status: :bad_request
     end
   end
   
 
   private 
+
+  def generate_token(user_id, secret_salt)
+    Digest::SHA256.hexdigest("#{user_id}#{secret_salt}")
+  end
 
   def student_params
     params.permit(
