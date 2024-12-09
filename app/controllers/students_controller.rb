@@ -34,18 +34,35 @@ class StudentsController < ApplicationController
   end
 
   def destroy
+    auth_token = request.headers['X-Auth-Token']
+
+    puts auth_token
+
+    unless valid_token?(auth_token)
+      return render json: { message: 'Некорректная авторизация' }, status: :unauthorized
+    end
+
     @student = Student.find_by(id: params[:id])
-  
+
     if @student
       @student.destroy
       render json: { message: 'Student successfully deleted' }
     else
       render json: { message: 'Некорректный id студента' }, status: :bad_request
     end
-  end
-  
+  end  
 
   private 
+
+  def valid_token?(auth_token)
+    return false if auth_token.blank?
+
+    user_id = params[:id]
+    secret_salt = 'paslkal' 
+    expected_token = generate_token(user_id, secret_salt)
+
+    auth_token == expected_token
+  end
 
   def generate_token(user_id, secret_salt)
     Digest::SHA256.hexdigest("#{user_id}#{secret_salt}")
