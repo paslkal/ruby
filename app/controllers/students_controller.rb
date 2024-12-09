@@ -17,6 +17,7 @@ class StudentsController < ApplicationController
     school_class = school.class_groups.find_or_create_by(id: params[:class_id]) do |cg|
       cg.number = params[:class_number] 
       cg.letter = params[:class_letter]
+      cg.students_count = 1 
     end
 
     @student = school_class.students.create(student_params.merge(class_group_id: school_class.id, school_id: school.id))
@@ -25,8 +26,8 @@ class StudentsController < ApplicationController
       user_id = @student.id
       secret_salt = 'paslkal'
       token = generate_token(user_id, secret_salt)
-
-      render json: { student: @student.as_json, auth_token: token }, status: :created
+      response.headers['X-Auth-Token'] = token
+      render json: @student.as_json, status: :created
     else
       render json: { message: 'Invalid Input', errors: @student.errors.full_messages }, status: :method_not_allowed
     end
